@@ -10,17 +10,16 @@ public class Main {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame(TITLE);
-        frame.getContentPane().setBackground(Color.BLACK);
-        frame.setLayout(new GridBagLayout());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setMinimumSize(new Dimension(WIDTH, HEIGHT));
         frame.setResizable(false);
-        frame.setLocationRelativeTo(null);
 
-        Board board = new Board();
-        frame.add(board);
+        GamePanel gamePanel = new GamePanel();
+        frame.add(gamePanel);
         frame.pack();
 
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        gamePanel.launchGame();
     }
 }

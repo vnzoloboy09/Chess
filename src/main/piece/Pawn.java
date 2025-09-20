@@ -14,8 +14,8 @@ public class Pawn extends Piece {
         super(board);
         this.col = col;
         this.row = row;
-        this.xPos = col * board.tileSize;
-        this.yPos = row * board.tileSize;
+        this.x = col * board.tileSize;
+        this.y = row * board.tileSize;
         this.isWhite = isWhite;
         this.name = "pawn";
 
@@ -23,7 +23,7 @@ public class Pawn extends Piece {
         BufferedImage buffer;
         try {
             buffer = ImageIO.read(ClassLoader.getSystemResourceAsStream(spritePath));
-            this.sprite = buffer.getScaledInstance(64, 64, Image.SCALE_DEFAULT);
+            this.sprite = buffer.getScaledInstance(board.tileSize, board.tileSize, Image.SCALE_DEFAULT);
         } catch(IOException e) {
              e.printStackTrace();
         }

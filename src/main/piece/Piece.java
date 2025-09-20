@@ -5,8 +5,8 @@ import java.awt.*;
 
 public abstract class Piece {
     Image sprite;
-    public int xPos, yPos;
-    int col, row;
+    public int col, row;
+    int x, y;
     boolean isFirstMove = true;
     boolean isWhite;
     int value;
@@ -18,6 +18,6 @@ public abstract class Piece {
     }
 
     public void draw(Graphics2D g2d) {
-        g2d.drawImage(sprite, xPos, yPos, null);
+        g2d.drawImage(sprite, x, y, null);
     }
 }
