@@ -32,8 +32,22 @@ public class Pawn extends Piece {
 
     @Override
     public boolean isValidMovement(int newCol, int newRow) {
-        return (newCol == col || newRow == row) ||
-                Math.abs(newRow - row) == Math.abs(newCol - col);
+        int direction = (isWhite ? -1 : +1);
+        if(newCol == col && newRow == row + direction && gp.getPiece(newCol, newRow) == null) {
+            return true;
+        }
+
+        if(isFirstMove && newCol == col && newRow == row + direction * 2 &&
+            gp.getPiece(newCol, newRow) == null && gp.getPiece(newCol, newRow - direction) == null)
+        {
+            return true;
+        }
+
+        if(Math.abs(newCol - col) == 1 && newRow == row + direction && gp.getPiece(newCol, newRow) != null) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override

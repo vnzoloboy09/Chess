@@ -16,6 +16,11 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
     Board board = new Board();
     Mouse mouse = new Mouse(board, this);
+    public class MoveInfo {
+        public int oldCol = -1, oldRow = -1;
+        public int newCol = -1, newRow = -1;
+    }
+    MoveInfo preMove = new MoveInfo();
 
     ArrayList<Piece> pieces = new ArrayList<Piece>();
     Piece selectedPiece = null;
@@ -69,6 +74,10 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public boolean isValidMove(Move move) {
+        if(move.piece.isWhite != turn) {
+            return false;
+        }
+
         if(move.capturePiece != null && move.capturePiece.isWhite == move.piece.isWhite) {
             return false;
         }
@@ -84,19 +93,59 @@ public class GamePanel extends JPanel implements Runnable {
         return true;
     }
 
+    public void makeMove(Move move) {
+        preMove.oldCol = move.oldCol;
+        preMove.oldRow = move.oldRow;
+        preMove.newCol = move.newCol;
+        preMove.newRow = move.newRow;
+
+        move.piece.col = move.newCol;
+        move.piece.row = move.newRow;
+        move.piece.x = move.newCol * board.tileSize;
+        move.piece.y = move.newRow * board.tileSize;
+
+        move.piece.isFirstMove = false;
+        selectedPiece = null;
+        turn = !turn;
+
+        pieces.remove(move.capturePiece);
+    }
+
+    public void makeMoveForPawn(Move move) {
+        int direction = (move.piece.isWhite? -1 : 1);
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         board.draw(g2d);
 
+        g2d.setColor(new Color(155, 235, 237, 190));
+        g2d.fillRect(preMove.oldCol * board.tileSize, preMove.oldRow * board.tileSize,
+                board.tileSize, board.tileSize);
+        g2d.fillRect(preMove.newCol * board.tileSize, preMove.newRow * board.tileSize,
+                board.tileSize, board.tileSize);
+
+        for(Piece p : pieces) {
+            if(p == selectedPiece)
+                continue;
+            p.draw(g2d);
+        }
+
         if(selectedPiece != null) {
             g2d.setColor(new Color(155, 235, 237, 190));
             g2d.fillRect(selectedPiece.col * board.tileSize, selectedPiece.row * board.tileSize,
                     board.tileSize, board.tileSize);
-        }
-
-        for(Piece p : pieces) {
-            p.draw(g2d);
+            for(int r = 0; r < board.rowSize; r++) {
+                for (int c = 0; c < board.colSize; c++) {
+                    if (isValidMove(new Move(this, r, c))) {
+                        g2d.setColor(new Color(178, 186, 178, 140));
+                        g2d.fillOval(r * board.tileSize + board.tileSize / 2 - 15,
+                                c * board.tileSize + board.tileSize / 2 - 15, 30, 30);
+                    }
+                }
+            }
+            selectedPiece.draw(g2d); // make the selected piece always on top
         }
     }
 

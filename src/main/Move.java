@@ -15,10 +15,9 @@ public class Move {
 
         this.newCol = newCol;
         this.newRow = newRow;
-        if(this.piece != null) {
+        if (this.piece != null) {
             this.oldCol = piece.col;
             this.oldRow = piece.row;
         }
-
     }
 }

@@ -21,7 +21,12 @@ public class Mouse extends MouseAdapter {
         int row = e.getY() / board.tileSize;
 
         Piece piece = gp.getPiece(col, row);
-        if(piece != null && piece.isWhite == gp.turn) {
+        if(piece != null) {
+            Move move = new Move(gp, col, row);
+            if(gp.selectedPiece != null && gp.isValidMove(move)) {
+                gp.makeMove(move);
+                return;
+            }
             if(gp.selectedPiece == null) {
                 gp.selectedPiece = piece;
             }
@@ -31,8 +36,14 @@ public class Mouse extends MouseAdapter {
             else {
                 gp.selectedPiece = piece;
             }
+            return;
         }
-        else {
+
+        if(gp.selectedPiece != null) {
+            Move move = new Move(gp, col, row);
+            if(gp.isValidMove(move)) {
+                gp.makeMove(move);
+            }
             gp.selectedPiece = null;
         }
     }
@@ -46,13 +57,7 @@ public class Mouse extends MouseAdapter {
             if(gp.selectedPiece.col != col || gp.selectedPiece.row != row) {
                 Move move = new Move(gp, col, row);
                 if(gp.isValidMove(move)) {
-                    gp.selectedPiece.col = col;
-                    gp.selectedPiece.row = row;
-                    gp.selectedPiece.x = gp.selectedPiece.col * board.tileSize;
-                    gp.selectedPiece.y = gp.selectedPiece.row * board.tileSize;
-                    gp.selectedPiece = null;
-
-    //                gp.turn = !gp.turn;
+                    gp.makeMove(move);
                 }
                 else {
                     gp.selectedPiece.x = gp.selectedPiece.col * board.tileSize;
