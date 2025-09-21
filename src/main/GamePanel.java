@@ -25,6 +25,8 @@ public class GamePanel extends JPanel implements Runnable {
     public int enPassantTileRow = -1;
     public boolean isPromoting = false;
 
+    CheckManager checkManager = new CheckManager(this);
+
     ArrayList<Piece> pieces = new ArrayList<Piece>();
     Piece selectedPiece = null;
 
@@ -64,7 +66,6 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private void update() {
-
     }
 
     public Piece getPiece(int col, int row) {
@@ -77,27 +78,26 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public boolean isValidMove(Move move) {
-        if(move.piece.isWhite != turn) {
+        if(move.piece.isWhite != turn)
             return false;
-        }
 
-        if(move.capturePiece != null && move.capturePiece.isWhite == move.piece.isWhite) {
+        if(sameTeam(move.piece, move.capturePiece))
             return false;
-        }
 
-        if(!move.piece.isValidMovement(move.newCol, move.newRow)) {
+        if(!move.piece.isValidMovement(move.newCol, move.newRow))
             return false;
-        }
 
-        if(move.piece.blockedByOtherPiece(move.newCol, move.newRow)) {
+        if(move.piece.blockedByOtherPiece(move.newCol, move.newRow))
             return false;
-        }
+
+        if(checkManager.gotChecked(move))
+            return false;
 
         return true;
     }
 
     public void makeMove(Move move) {
-        if(move.piece.name == "pawn" ) {
+        if(move.piece.name.equals("pawn")) {
             makeMoveForPawn(move);
         }
 
@@ -147,6 +147,23 @@ public class GamePanel extends JPanel implements Runnable {
         isPromoting = true;
     }
 
+    public boolean sameTeam(Piece p1, Piece p2) {
+        if(p1 == null || p2 == null)
+            return false;
+        return p1.isWhite == p2.isWhite;
+    }
+
+    public Piece getKing(boolean side) {
+        for(Piece p : pieces) {
+            if(p.isWhite != side) {
+                continue;
+            }
+            if(p.name.equals("king"))
+                return p;
+        }
+        return null;
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
@@ -171,7 +188,7 @@ public class GamePanel extends JPanel implements Runnable {
             for(int r = 0; r < board.rowSize; r++) {
                 for (int c = 0; c < board.colSize; c++) {
                     if (isValidMove(new Move(this, r, c))) {
-                        g2d.setColor(new Color(178, 186, 178, 140));
+                        g2d.setColor(new Color(178, 186, 178, 186));
                         g2d.fillOval(r * board.tileSize + board.tileSize / 2 - 15,
                                 c * board.tileSize + board.tileSize / 2 - 15, 30, 30);
                     }
@@ -191,7 +208,7 @@ public class GamePanel extends JPanel implements Runnable {
         String[] option = {"Queen", "Rook", "Bishop", "Knight"};
 
         for(int i = 0; i < 4; i++) {
-            g2d.setColor(new Color(114, 209, 96));
+            g2d.setColor(new Color(151, 204, 143));
             g2d.fillRect(selectedPiece.col * board.tileSize, (selectedPiece.row - i * direction) * board.tileSize,
                     board.tileSize, board.tileSize);
             g2d.setFont(new Font("Arial", Font.BOLD, 24));
