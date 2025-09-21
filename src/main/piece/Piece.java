@@ -6,7 +6,7 @@ import main.GamePanel;
 import java.awt.*;
 
 public abstract class Piece {
-    Image sprite;
+    public Image sprite;
     public int col, row;
     public int x, y;
     public int preCol, preRow;
@@ -15,7 +15,7 @@ public abstract class Piece {
     int value;
     Board board;
     GamePanel gp;
-    String name;
+    public String name;
 
     public Piece(Board board, GamePanel gamePanel) {
         this.gp = gamePanel;

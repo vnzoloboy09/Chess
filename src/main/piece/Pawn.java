@@ -47,6 +47,13 @@ public class Pawn extends Piece {
             return true;
         }
 
+        if(gp.enPassantTileCol == newCol && gp.enPassantTileRow == newRow &&
+            Math.abs(newCol - col) == 1 && row == this.row + direction &&
+                gp.getPiece(newCol, newRow - direction) != null)
+        {
+            return true;
+        }
+
         return false;
     }
 

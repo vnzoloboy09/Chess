@@ -1,6 +1,6 @@
 package main;
 
-import main.piece.Piece;
+import main.piece.*;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,6 +19,11 @@ public class Mouse extends MouseAdapter {
     public void mousePressed(MouseEvent e) {
         int col = e.getX() / board.tileSize;
         int row = e.getY() / board.tileSize;
+
+        if(gp.isPromoting) {
+            selectPromotion(col, row);
+            return;
+        }
 
         Piece piece = gp.getPiece(col, row);
         if(piece != null) {
@@ -44,7 +49,6 @@ public class Mouse extends MouseAdapter {
             if(gp.isValidMove(move)) {
                 gp.makeMove(move);
             }
-            gp.selectedPiece = null;
         }
     }
 
@@ -82,6 +86,45 @@ public class Mouse extends MouseAdapter {
         if(gp.selectedPiece != null) {
             gp.selectedPiece.x = e.getX() - board.tileSize / 2;
             gp.selectedPiece.y = e.getY() - board.tileSize / 2;
+        }
+    }
+
+    public void selectPromotion(int col, int row) {
+        int diretion = gp.selectedPiece.isWhite? -1 : 1;
+        if(row == gp.selectedPiece.row) {
+            gp.pieces.add(new Queen(board, gp, gp.selectedPiece.col,
+                    gp.selectedPiece.row, gp.selectedPiece.isWhite));
+            gp.isPromoting = false;
+            gp.selectedPiece = null;
+            gp.turn = !gp.turn;
+            return;
+        }
+
+        if(row == gp.selectedPiece.row - diretion) {
+            gp.pieces.add(new Rook(board, gp, gp.selectedPiece.col,
+                    gp.selectedPiece.row, gp.selectedPiece.isWhite));
+            gp.isPromoting = false;
+            gp.selectedPiece = null;
+            gp.turn = !gp.turn;
+            return;
+        }
+
+        if(row == gp.selectedPiece.row - diretion * 2) {
+            gp.pieces.add(new Bishop(board, gp, gp.selectedPiece.col,
+                    gp.selectedPiece.row, gp.selectedPiece.isWhite));
+            gp.isPromoting = false;
+            gp.selectedPiece = null;
+            gp.turn = !gp.turn;
+            return;
+        }
+
+        if(row == gp.selectedPiece.row - diretion * 3) {
+            gp.pieces.add(new Knight(board, gp, gp.selectedPiece.col,
+                    gp.selectedPiece.row, gp.selectedPiece.isWhite));
+            gp.isPromoting = false;
+            gp.selectedPiece = null;
+            gp.turn = !gp.turn;
+            return;
         }
     }
 }

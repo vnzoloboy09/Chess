@@ -21,6 +21,9 @@ public class GamePanel extends JPanel implements Runnable {
         public int newCol = -1, newRow = -1;
     }
     MoveInfo preMove = new MoveInfo();
+    public int enPassantTileCol = -1;
+    public int enPassantTileRow = -1;
+    public boolean isPromoting = false;
 
     ArrayList<Piece> pieces = new ArrayList<Piece>();
     Piece selectedPiece = null;
@@ -94,6 +97,10 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void makeMove(Move move) {
+        if(move.piece.name == "pawn" ) {
+            makeMoveForPawn(move);
+        }
+
         preMove.oldCol = move.oldCol;
         preMove.oldRow = move.oldRow;
         preMove.newCol = move.newCol;
@@ -105,14 +112,39 @@ public class GamePanel extends JPanel implements Runnable {
         move.piece.y = move.newRow * board.tileSize;
 
         move.piece.isFirstMove = false;
-        selectedPiece = null;
-        turn = !turn;
+        if(!isPromoting) {
+            turn = !turn;
+            selectedPiece = null;
+        }
 
         pieces.remove(move.capturePiece);
     }
 
     public void makeMoveForPawn(Move move) {
         int direction = (move.piece.isWhite? -1 : 1);
+
+        if(move.newCol == enPassantTileCol && move.newRow == enPassantTileRow) {
+            move.capturePiece = getPiece(move.newCol, move.newRow - direction);
+        }
+
+        if(Math.abs(move.newRow - move.piece.row) == 2) {
+            enPassantTileCol = move.newCol;
+            enPassantTileRow = move.newRow - direction;
+        }
+        else {
+            enPassantTileCol = -1;
+            enPassantTileRow = -1;
+        }
+
+        int promotionRow = (move.piece.isWhite? 0 : 7);
+        if(move.newRow == promotionRow) {
+            promotePawn(move);
+        }
+    }
+
+    public void promotePawn(Move move) {
+        pieces.remove(move.piece);
+        isPromoting = true;
     }
 
     public void paintComponent(Graphics g) {
@@ -146,6 +178,26 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
             selectedPiece.draw(g2d); // make the selected piece always on top
+        }
+
+        if(isPromoting) {
+            drawPromoteMenu(g2d);
+        }
+    }
+
+    public void drawPromoteMenu(Graphics2D g2d) {
+        int direction = selectedPiece.isWhite? -1 : 1;
+
+        String[] option = {"Queen", "Rook", "Bishop", "Knight"};
+
+        for(int i = 0; i < 4; i++) {
+            g2d.setColor(new Color(114, 209, 96));
+            g2d.fillRect(selectedPiece.col * board.tileSize, (selectedPiece.row - i * direction) * board.tileSize,
+                    board.tileSize, board.tileSize);
+            g2d.setFont(new Font("Arial", Font.BOLD, 24));
+            g2d.setColor(Color.BLACK);
+            g2d.drawString(option[i], selectedPiece.col * board.tileSize + 5,
+                    (selectedPiece.row - i * direction + 1) * board.tileSize - board.tileSize / 2);
         }
     }
 
