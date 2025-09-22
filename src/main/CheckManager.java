@@ -22,10 +22,11 @@ public class CheckManager {
         return checkedByRook   (king, move.newCol, move.newRow, kingCol, kingRow) ||
                checkedByBishop (king, move.newCol, move.newRow, kingCol, kingRow) ||
                checkedByKnight (king, move.newCol, move.newRow, kingCol, kingRow) ||
-               checkByPawn     (king, move.newCol, move.newRow, kingCol, kingRow);
+               checkByPawn     (king, move.newCol, move.newRow, kingCol, kingRow) ||
+               checkByKing     (king, move.newCol, move.newRow, kingCol, kingRow);
     }
 
-    public boolean checkedByRook(Piece king, int newCol, int newRow, int kingCol, int kingRow) {
+    private boolean checkedByRook(Piece king, int newCol, int newRow, int kingCol, int kingRow) {
         return
            findRookAtDirection( 0,  1, king, newCol, newRow, kingCol, kingRow) ||
            findRookAtDirection( 1,  0, king, newCol, newRow, kingCol, kingRow) ||
@@ -34,7 +35,7 @@ public class CheckManager {
 
     }
 
-    public boolean checkedByBishop(Piece king, int newCol, int newRow, int kingCol, int kingRow) {
+    private boolean checkedByBishop(Piece king, int newCol, int newRow, int kingCol, int kingRow) {
         return
            findBishopAtDirection( 1,  1, king, newCol, newRow, kingCol, kingRow) ||
            findBishopAtDirection(-1, -1, king, newCol, newRow, kingCol, kingRow) ||
@@ -42,7 +43,7 @@ public class CheckManager {
            findBishopAtDirection(-1,  1, king, newCol, newRow, kingCol, kingRow);
     }
 
-    public boolean checkedByKnight(Piece king, int newCol, int newRow, int kingCol, int kingRow) {
+    private boolean checkedByKnight(Piece king, int newCol, int newRow, int kingCol, int kingRow) {
         return
            findKnightAt(kingCol - 2, kingRow - 1, king, newCol, newRow) ||
            findKnightAt(kingCol - 1, kingRow - 2, king, newCol, newRow) ||
@@ -54,13 +55,29 @@ public class CheckManager {
            findKnightAt(kingCol + 1, kingRow + 2, king, newCol, newRow);
     }
 
-    public boolean checkByPawn(Piece king, int newCol, int newRow, int kingCol, int kingRow) {
+    private boolean checkByPawn(Piece king, int newCol, int newRow, int kingCol, int kingRow) {
         int direction = king.isWhite? -1 : 1;
         return findPawnAt(kingCol + 1, kingRow + direction, king, newCol, newRow) ||
                findPawnAt(kingCol - 1, kingRow + direction, king, newCol, newRow);
     }
 
-    public boolean findPawnAt(int col, int row, Piece king, int newCol, int newRow) {
+    private boolean checkByKing(Piece king, int newCol, int newRow, int kingCol, int kingRow) {
+        return findKingAt(kingCol - 1, kingRow - 1, king) ||
+               findKingAt(kingCol + 1, kingRow - 1, king) ||
+               findKingAt(kingCol    , kingRow - 1, king) ||
+               findKingAt(kingCol - 1, kingRow,     king) ||
+               findKingAt(kingCol + 1, kingRow,     king) ||
+               findKingAt(kingCol - 1, kingRow + 1, king) ||
+               findKingAt(kingCol + 1, kingRow + 1, king) ||
+               findKingAt(kingCol    , kingRow + 1, king);
+    }
+
+    private boolean findKingAt(int col, int row, Piece king) {
+        Piece piece = gp.getPiece(col, row);
+        return piece != null && !gp.sameTeam(piece, king) && piece.name.equals("king");
+    }
+
+    private boolean findPawnAt(int col, int row, Piece king, int newCol, int newRow) {
         Piece piece = gp.getPiece(col, row);
         return piece != null && !gp.sameTeam(piece, king) && piece.name.equals("pawn")
                 && !(piece.col == newCol && piece.row == newRow);
@@ -107,7 +124,7 @@ public class CheckManager {
         return false;
     }
 
-    public boolean findKnightAt(int col, int row, Piece king, int newCol, int newRow) {
+    private boolean findKnightAt(int col, int row, Piece king, int newCol, int newRow) {
         Piece piece = gp.getPiece(col, row);
         return piece != null && !gp.sameTeam(piece, king) && piece.name.equals("knight") &&
                     !(piece.col == newCol && piece.row == newRow);

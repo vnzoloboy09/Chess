@@ -25,10 +25,12 @@ public class GamePanel extends JPanel implements Runnable {
     public int enPassantTileRow = -1;
     public boolean isPromoting = false;
 
-    CheckManager checkManager = new CheckManager(this);
+    public CheckManager checkManager = new CheckManager(this);
 
     ArrayList<Piece> pieces = new ArrayList<Piece>();
     Piece selectedPiece = null;
+
+    SoundPlayer soundPlayer = new SoundPlayer();
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -97,8 +99,16 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void makeMove(Move move) {
+        if(move.capturePiece == null)
+            soundPlayer.playMoveSound();
+        else
+            soundPlayer.playCaptureSound();
+
         if(move.piece.name.equals("pawn")) {
             makeMoveForPawn(move);
+        }
+        else if(move.piece.name.equals("king")) {
+            makeMoveForKing(move);
         }
 
         preMove.oldCol = move.oldCol;
@@ -120,7 +130,7 @@ public class GamePanel extends JPanel implements Runnable {
         pieces.remove(move.capturePiece);
     }
 
-    public void makeMoveForPawn(Move move) {
+    private void makeMoveForPawn(Move move) {
         int direction = (move.piece.isWhite? -1 : 1);
 
         if(move.newCol == enPassantTileCol && move.newRow == enPassantTileRow) {
@@ -164,6 +174,21 @@ public class GamePanel extends JPanel implements Runnable {
         return null;
     }
 
+    private void makeMoveForKing(Move move) {
+        if(Math.abs(move.newCol - move.piece.col) == 2) {
+            Piece rook;
+            if(move.piece.col < move.newCol) {
+                rook = getPiece(7, move.piece.row);
+                rook.col = 5;
+            }
+            else {
+                rook = getPiece(0, move.piece.row);
+                rook.col = 3;
+            }
+            rook.x = rook.col * board.tileSize;
+        }
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
@@ -187,10 +212,10 @@ public class GamePanel extends JPanel implements Runnable {
                     board.tileSize, board.tileSize);
             for(int r = 0; r < board.rowSize; r++) {
                 for (int c = 0; c < board.colSize; c++) {
-                    if (isValidMove(new Move(this, r, c))) {
+                    if (isValidMove(new Move(this, c, r))) {
                         g2d.setColor(new Color(178, 186, 178, 186));
-                        g2d.fillOval(r * board.tileSize + board.tileSize / 2 - 15,
-                                c * board.tileSize + board.tileSize / 2 - 15, 30, 30);
+                        g2d.fillOval(c * board.tileSize + board.tileSize / 2 - 15,
+                                r * board.tileSize + board.tileSize / 2 - 15, 30, 30);
                     }
                 }
             }

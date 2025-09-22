@@ -2,6 +2,7 @@ package main.piece;
 
 import main.Board;
 import main.GamePanel;
+import main.Move;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -30,11 +31,39 @@ public class King extends Piece {
 
     @Override
     public boolean isValidMovement(int newCol, int newRow) {
-        return Math.abs(newRow - row) <= 1 && Math.abs(newCol - col) <= 1;
+        return (Math.abs(newRow - row) <= 1 && Math.abs(newCol - col) <= 1) || canCastle(newCol, newRow);
     }
 
     @Override
     public boolean blockedByOtherPiece(int newCol, int newRow) {
+        return false;
+    }
+
+    private boolean canCastle(int newCol, int newRow) {
+        if(!isFirstMove)
+            return false;
+
+        if(row == newRow) {
+            if(newCol == 6) {
+                Piece rook = gp.getPiece(7, row);
+
+                return rook != null && rook.isFirstMove &&
+                       !gp.checkManager.gotChecked(new Move(gp, col, row)) &&
+                       gp.getPiece(5, row) == null &&
+                       gp.getPiece(6, row) == null;
+            }
+
+            if(newCol == 2) {
+                Piece rook = gp.getPiece(0, row);
+
+                return rook != null && rook.isFirstMove &&
+                       !gp.checkManager.gotChecked(new Move(gp, col, row)) &&
+                       gp.getPiece(2, row) == null &&
+                       gp.getPiece(3, row) == null &&
+                       gp.getPiece(1, row) == null;
+            }
+        }
+
         return false;
     }
 }
