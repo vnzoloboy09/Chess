@@ -1,6 +1,7 @@
 package main.piece;
 
 import main.Board;
+import main.GamePanel;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -8,8 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Knight extends Piece {
-    public Knight(Board board, int col, int row, boolean isWhite) {
-        super(board);
+    public Knight(Board board, GamePanel gp, int col, int row, boolean isWhite) {
+        super(board, gp);
         this.col = col;
         this.row = row;
         this.x = col * board.tileSize;
@@ -25,5 +26,15 @@ public class Knight extends Piece {
         } catch(IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean isValidMovement(int newCol, int newRow) {
+        return Math.abs(newRow - row) * Math.abs(newCol - col) == 2;
+    }
+
+    @Override
+    public boolean blockedByOtherPiece(int newCol, int newRow) {
+        return false;
     }
 }

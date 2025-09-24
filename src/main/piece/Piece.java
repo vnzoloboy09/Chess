@@ -1,21 +1,34 @@
 package main.piece;
 
 import main.Board;
+import main.GamePanel;
+
 import java.awt.*;
 
 public abstract class Piece {
-    Image sprite;
+    public Image sprite;
     public int col, row;
-    int x, y;
-    boolean isFirstMove = true;
-    boolean isWhite;
+    public int x, y;
+    public int preCol, preRow;
+    public boolean isFirstMove = true;
+    public boolean isWhite;
     int value;
     Board board;
-    String name;
+    GamePanel gp;
+    public String name;
 
-    public Piece(Board board) {
+    public Piece(Board board, GamePanel gamePanel) {
+        this.gp = gamePanel;
         this.board = board;
     }
+
+    public void updatePosition() {
+        x = col * board.tileSize;
+        y = row * board.tileSize;
+    }
+
+    public abstract boolean isValidMovement(int newCol, int newRow);
+    public abstract boolean blockedByOtherPiece(int newCol, int newRow);
 
     public void draw(Graphics2D g2d) {
         g2d.drawImage(sprite, x, y, null);
